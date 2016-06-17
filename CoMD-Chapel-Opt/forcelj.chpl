@@ -21,7 +21,7 @@ class ForceLJ : Force {
     epsilon  = 0.167;
     mass = 63.55 * amuToInternalMass;
     lat = 3.615;
-    latticeType = "FCC";  
+    latticeType = "FCC";
     cutoff = 2.5*sigma;
     name = "Cu";
     atomicNumber = 29;
@@ -50,7 +50,7 @@ class ForceLJ : Force {
   }
 
   proc compute() : void {
-if useChplVis then tagVdebug("computeLJForce");
+tagVdebug("computeLJForce");
     coforall ijk in locDom {
       on locGrid[ijk] {
         const MyDom = Grid[ijk];
@@ -76,11 +76,11 @@ if useChplVis then tagVdebug("computeLJForce");
         }
       }
     }
-if useChplVis then pauseVdebug();
+pauseVdebug();
   }
 
   proc computeLocal() : void {
-if useChplVis then tagVdebug("computeLJForce");
+tagVdebug("computeLJForce");
     coforall ijk in locDom {
       on locGrid[ijk] {
         const MyDom = Grid[ijk];
@@ -108,9 +108,9 @@ local {
 }
       }
     }
-if useChplVis then pauseVdebug();
+pauseVdebug();
   }
-    
+
   proc print() : void {
     writeln("Potential Data:");
     writeln("   Potential type   : ", potName);

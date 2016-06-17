@@ -171,7 +171,7 @@ local {
 
 proc totalEnergy() {
 tArray[timerEnum.COMMREDUCE].start();
-if useChplVis then tagVdebug("totalEnergy");
+tagVdebug("totalEnergy");
   coforall ijk in locDom {
     on locGrid[ijk] {
       const MyDom = Grid[ijk];
@@ -196,7 +196,7 @@ local {
     keTotal += e(1);
     peTotal += e(2);
   }
-if useChplVis then pauseVdebug();
+pauseVdebug();
 tArray[timerEnum.COMMREDUCE].stop();
 }
 
@@ -442,10 +442,10 @@ proc exchangeData(const ref MyDom:Domain, const in i : int)
 
 proc redistributeAtoms() {
 tArray[timerEnum.REDIST].start();
-if useChplVis then tagVdebug("updateLinkCells");
+tagVdebug("updateLinkCells");
   updateLinkCells();
-if useChplVis then pauseVdebug();
-if useChplVis then tagVdebug("haloExchange");
+pauseVdebug();
+tagVdebug("haloExchange");
 tArray[timerEnum.ATOMHALO].start();
   // halo exchange
   for i in 1..6 by 2 {
@@ -456,11 +456,11 @@ tArray[timerEnum.ATOMHALO].start();
     }
   }
 tArray[timerEnum.ATOMHALO].stop();
-if useChplVis then pauseVdebug();
+pauseVdebug();
 
-if useChplVis then tagVdebug("sortAtoms");
+tagVdebug("sortAtoms");
   sortAtomsInCells();
-if useChplVis then pauseVdebug();
+pauseVdebug();
 
 tArray[timerEnum.REDIST].stop();
 }
@@ -489,30 +489,30 @@ tArray[timerEnum.FCREATE].stop();
   if(lat < 0.0) then latticeConstant = f.lat;
 
 tArray[timerEnum.INITGRID].start();
-if useChplVis then tagVdebug("initGrid");
+tagVdebug("initGrid");
   initGrid(latticeConstant, f);
-if useChplVis then pauseVdebug();
+pauseVdebug();
 tArray[timerEnum.INITGRID].stop();
 
 tArray[timerEnum.EPILOGUE].start();
   f.epilogue();
 tArray[timerEnum.EPILOGUE].stop();
 
-if useChplVis then tagVdebug("createLattice");
+tagVdebug("createLattice");
   createFccLattice(latticeConstant);
-if useChplVis then pauseVdebug();
+pauseVdebug();
 
   const cutoff = f.cutoff;
 
   // delete original force object since it has been replicated on all domains
   // if(replicateForce) then delete force;
 
-if useChplVis then tagVdebug("setTemp");
+tagVdebug("setTemp");
   setTemperature(temp);
-//if useChplVis then pauseVdebug();
-if useChplVis then tagVdebug("randomDisp");
+//pauseVdebug();
+tagVdebug("randomDisp");
   randomDisplacements(temp);
-if useChplVis then pauseVdebug();
+pauseVdebug();
 tArray[timerEnum.REDIST1].start();
   redistributeAtoms();
 tArray[timerEnum.REDIST1].stop();
@@ -637,18 +637,18 @@ tArray[timerEnum.COMMREDUCE].stop();
 
 proc sumAtoms() {
 tArray[timerEnum.COMMREDUCE].start();
-if useChplVis then tagVdebug("sumAtoms");
+tagVdebug("sumAtoms");
   numAtoms = 0;
   forall ijk in locDom with (+ reduce numAtoms) {
     numAtoms += Grid[ijk].numLocalAtoms;
   }
-if useChplVis then pauseVdebug();
+pauseVdebug();
 tArray[timerEnum.COMMREDUCE].stop();
 }
 
 proc advanceVelocity(const in dt : real) {
 tArray[timerEnum.VELOCITY].start();
-if useChplVis then tagVdebug("advanceVelocity");
+tagVdebug("advanceVelocity");
   coforall ijk in locDom {
     on locGrid[ijk] {
       // TODO: Some communication when accessing our Domain class
@@ -663,13 +663,13 @@ local {
 }
     }
   }
-if useChplVis then pauseVdebug();
+pauseVdebug();
 tArray[timerEnum.VELOCITY].stop();
 }
 
 proc advancePosition(const in dt : real) {
 tArray[timerEnum.POSITION].start();
-if useChplVis then tagVdebug("advancePosition");
+tagVdebug("advancePosition");
   coforall ijk in locDom {
     on locGrid[ijk] {
       const MyDom = Grid[ijk];
@@ -683,7 +683,7 @@ local {
 }
     }
   }
-if useChplVis then pauseVdebug();
+pauseVdebug();
 tArray[timerEnum.POSITION].stop();
 }
 
@@ -706,12 +706,10 @@ proc printThings(t : int, tPrev : int, elapsed : real) {
   writef(" %6i %10.2dr %18.12dr %18.12dr %18.12dr %12.4dr %10.4dr %12i\n", t, t*dt, (keTotal+peTotal)/numAtoms, peTotal/numAtoms, keTotal/numAtoms, temp, timePerAtom, numAtoms);
 }
 
-//use VisualDebug;
-
 proc main(args: [] string) {
 tArray[timerEnum.TOTAL].start();
-if useChplVis then startVdebug(visName);
-if useChplVis then pauseVdebug();
+startVdebug(visName);
+pauseVdebug();
 
   for a in args {
     if(a == "--help") {
@@ -734,7 +732,7 @@ if useChplVis then pauseVdebug();
       writeln("--temp           : initial temprature (in K, default 600K)");
       writeln("--delta          : initial delta (in Angs, default 0)");
       writeln("--replicateForce : replicate the force object per locale (default true, will replicate)");
-      writeln("--useChplVis     : enable chplvis (default false, disabled)");
+      writeln("--VisualDebugOn  : enable chplvis (default false, disabled)");
       writeln("--visName        : name of chplvis output file (default MD-Vis-0)");
       exit(0);
     }
@@ -805,7 +803,7 @@ tArray[timerEnum.LOOP].stop();
   sumAtoms();
   printThings(iStep, iStepPrev, elapsed);
 
-if useChplVis then stopVdebug();
+stopVdebug();
 tArray[timerEnum.TOTAL].stop();
 
   yyyymmdd = getCurrentDate();

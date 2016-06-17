@@ -17,7 +17,6 @@ config const dt : real = 1;                           // timestep length (fs)
 config const lat : real = -1.0;                       // lattice parameter (Angstroms)
 config const temp : real = 600;                       // initial temperature (K)
 config const delta: real = 0;                         // initial delta (Angstroms)
-config const useChplVis : int = 0;                    // whether to use chplvis or not
 config const visName = "MD-Vis-0";                    // name of the chplvis file
 
 config const replicateForce : int = 1;                // clone the force object per domain

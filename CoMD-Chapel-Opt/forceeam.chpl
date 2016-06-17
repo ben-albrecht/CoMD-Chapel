@@ -77,12 +77,12 @@ class EAMDomain {
   var rhoBar    : [localDom] RList;
   var neighDom  : domain(1) = {1..6};
   var neighs    : [neighDom] int3;
-  //TODO: This temporary buffer was introduced to eliminate a spike during initial 
+  //TODO: This temporary buffer was introduced to eliminate a spike during initial
   // atom redistribute process. Figure out what causes that and eliminate this extra buffer
   // var temps     : [neighDom] EAMFaceArr;
   var srcSlice  : [neighDom] domain(3);
   var destSlice : [neighDom] domain(3);
-//  var ticker    = new Ticker("     eamcommPull");   // ticker for halo exchange  
+//  var ticker    = new Ticker("     eamcommPull");   // ticker for halo exchange
 }
 
 class EAMPot {
@@ -117,7 +117,7 @@ class ForceEAM : Force {
   }
 
   proc epilogue() : void {
-if useChplVis then tagVdebug("setupEAMForce");
+tagVdebug("setupEAMForce");
     this.eamPot = new EAMPot();
     const boxSpace = {1..numBoxes(1), 1..numBoxes(2), 1..numBoxes(3)};
     const distSpace = boxSpace dmapped Block(boundingBox=boxSpace, targetLocales=locGrid);
@@ -127,7 +127,7 @@ if useChplVis then tagVdebug("setupEAMForce");
         const MyLocDom = distSpace._value.locDoms[ijk].myBlock;
         var MyEAMDom = new EAMDomain(localDom = MyLocDom);
         eamDom[ijk] = MyEAMDom;
-        
+
         const lDh = locDom.high;
         const bSh = boxSpace.high;
 
@@ -178,7 +178,7 @@ local {
 }
       }
     }
-if useChplVis then pauseVdebug();
+pauseVdebug();
   }
 
   inline proc throwError(errMsg:string) : void {
@@ -223,7 +223,7 @@ if useChplVis then pauseVdebug();
     }
     values(0) = values(1) + (values(1) - values(2));
     this.phiIO = new InterpolationObject(nR, x0, dR, values);
-		
+
     // Read electron density rho(r)
     for ii in 0..nR-1 do values(ii) = r.read(real);
     this.rhoIO = new InterpolationObject(nR, x0, dR, values);
@@ -233,9 +233,9 @@ if useChplVis then pauseVdebug();
     var r = fchan.reader();
 
     // line 3 -- comments
-    r.readln();	
-    r.readln();	
-    r.readln();	
+    r.readln();
+    r.readln();
+    r.readln();
 
     // line 4
     var species = r.readln(int, string);
@@ -268,7 +268,7 @@ if useChplVis then pauseVdebug();
     var bufSize = max(nRho, nR);
     var values : [0..bufSize-1] real;
     var x0 : real = 0.0;
-	
+
     // Read embedding energy F(rhobar)
     for ii in 0..nRho-1 do values(ii) = r.readln(real);
     this.fIO   = new InterpolationObject(nRho, x0, dRho, values);
@@ -309,7 +309,7 @@ if useChplVis then pauseVdebug();
     cobegin {
       { haloExchange(MyEAMDom, eamDom, i); }
       { haloExchange(MyEAMDom, eamDom, i+1); }
-    } 
+    }
   }
 
   proc exchangeData() {
@@ -349,7 +349,7 @@ if useChplVis then pauseVdebug();
 
   proc compute() : void {
     tArray[timerEnum.FORCE1].start();
-if useChplVis then tagVdebug("computeEAMForce");
+tagVdebug("computeEAMForce");
     const eamDom => this.eamPot.eamDom;
     coforall ijk in locDom {
       on locGrid[ijk] {
@@ -386,12 +386,12 @@ if useChplVis then tagVdebug("computeEAMForce");
       }
     }
     tArray[timerEnum.FORCE1].stop();
-if useChplVis then pauseVdebug();
-if useChplVis then tagVdebug("exchangeEAMHalo");
+pauseVdebug();
+tagVdebug("exchangeEAMHalo");
     exchangeData();
-if useChplVis then pauseVdebug();
+pauseVdebug();
     tArray[timerEnum.FORCE2].start();
-if useChplVis then tagVdebug("computeEAMForce");
+tagVdebug("computeEAMForce");
     coforall ijk in locDom {
       on locGrid[ijk] {
         const MyDom = Grid[ijk];
@@ -414,12 +414,12 @@ if useChplVis then tagVdebug("computeEAMForce");
       }
     }
     tArray[timerEnum.FORCE2].stop();
-if useChplVis then pauseVdebug();
+pauseVdebug();
   }
 
   proc computeLocal() : void {
     tArray[timerEnum.FORCE1].start();
-if useChplVis then tagVdebug("computeEAMForce");
+tagVdebug("computeEAMForce");
     const eamDom => this.eamPot.eamDom;
     coforall ijk in locDom {
       on locGrid[ijk] {
@@ -458,12 +458,12 @@ local {
 }
     }
     tArray[timerEnum.FORCE1].stop();
-if useChplVis then pauseVdebug();
-if useChplVis then tagVdebug("exchangeEAMHalo");
+pauseVdebug();
+tagVdebug("exchangeEAMHalo");
     exchangeData();
-if useChplVis then pauseVdebug();
+pauseVdebug();
     tArray[timerEnum.FORCE2].start();
-if useChplVis then tagVdebug("computeEAMForce");
+tagVdebug("computeEAMForce");
     coforall ijk in locDom {
       on locGrid[ijk] {
         const MyDom = Grid[ijk];
@@ -488,7 +488,7 @@ local {
       }
     }
     tArray[timerEnum.FORCE2].stop();
-if useChplVis then pauseVdebug();
+pauseVdebug();
   }
 
   proc print() : void {
