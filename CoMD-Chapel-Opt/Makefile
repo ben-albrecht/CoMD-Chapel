@@ -5,5 +5,9 @@ SAVE_C_CODE= --savec ./c_code
 
 md: rand.chpl types.chpl configs.chpl helpers.chpl setup.chpl force.chpl forcelj.chpl forceeam.chpl MD.chpl
 	chpl $(CHPL_FLAGS) $(SAVE_C_CODE) $^ -o $@
+
+debug: rand.chpl types.chpl configs.chpl helpers.chpl setup.chpl force.chpl forcelj.chpl forceeam.chpl MD.chpl
+	chpl $(SAVE_C_CODE) $^ -o md
+
 clean:
 	-@rm -vf md md_real *.o

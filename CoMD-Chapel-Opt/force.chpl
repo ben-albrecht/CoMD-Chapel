@@ -1,7 +1,7 @@
 use types;
 use configs;
 
-class Force {
+record Force {
   var cutoff : real;        // potential cutoff distance in Angstroms
   var mass : real;          // mass of atoms in internal units
   var lat : real;           // lattice spacing (in Angstroms) of unit cell
@@ -15,6 +15,6 @@ class Force {
   proc compute() : void { }
   proc computeLocal() : void { }
   proc print() : void {}
-  proc replicate() : Force { return nil; }
+  //proc replicate() : Force { return nil; }
   proc epilogue() : void { }
 }

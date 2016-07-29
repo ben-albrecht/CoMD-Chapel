@@ -3,7 +3,7 @@ use setup;
 use force;
 use VisualDebug;
 
-class ForceLJ : Force {
+record ForceLJ : Force {
   const POT_SHIFT : real = 1.0;
 
   var sigma : real;
@@ -21,7 +21,7 @@ class ForceLJ : Force {
     epsilon  = 0.167;
     mass = 63.55 * amuToInternalMass;
     lat = 3.615;
-    latticeType = "FCC";  
+    latticeType = "FCC";
     cutoff = 2.5*sigma;
     name = "Cu";
     atomicNumber = 29;
@@ -110,7 +110,7 @@ local {
     }
 if useChplVis then pauseVdebug();
   }
-    
+
   proc print() : void {
     writeln("Potential Data:");
     writeln("   Potential type   : ", potName);
@@ -124,7 +124,7 @@ if useChplVis then pauseVdebug();
     writeln("   Sigma            : ", sigma, " Angstroms");
   }
 
-  proc replicate() : ForceLJ {
+  /*proc replicate() : ForceLJ {
     var temp = new ForceLJ();
     temp.cutoff = this.cutoff;
     temp.mass = this.mass;
@@ -143,5 +143,5 @@ if useChplVis then pauseVdebug();
     temp.epsilon2 = this.epsilon2;
     temp.epsilon4 = this.epsilon4;
     return temp;
-  }
+  }*/
 }

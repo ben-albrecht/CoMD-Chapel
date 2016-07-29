@@ -79,10 +79,10 @@ class Domain {
   var domKEPE        : (real, real);                       // total KE, PE for this domain
   var vcmTemp        : real3;                              // temp vcm for this domain
 
-  var force          : Force;                              // clones! may the force be with you
-//  var haloTicker1    = new Ticker("      commHaloPull");   // ticker for halo exchange  
-//  var haloTicker2    = new Ticker("      commHaloSync");   // ticker for halo exchange  
-//  var haloTicker3    = new Ticker("      commHaloUpdt");   // ticker for halo exchange  
+  const force        : Force;                              // clones! may the force be with you
+//  var haloTicker1    = new Ticker("      commHaloPull");   // ticker for halo exchange
+//  var haloTicker2    = new Ticker("      commHaloSync");   // ticker for halo exchange
+//  var haloTicker3    = new Ticker("      commHaloUpdt");   // ticker for halo exchange
 }
 
 const locDom  : domain(3) = {0..xproc-1, 0..yproc-1, 0..zproc-1};

@@ -89,7 +89,7 @@ class EAMPot {
   var eamDom : [locDom] EAMDomain;
 }
 
-class ForceEAM : Force {
+record ForceEAM : Force {
 
   var eamPot : EAMPot;
   var phiIO, rhoIO, fIO : InterpolationObject;
@@ -502,7 +502,7 @@ if useChplVis then pauseVdebug();
     writeln("   Cutoff           : ", cutoff, " Angstroms");
   }
 
-  proc replicate() : ForceEAM {
+  /*proc replicate() : ForceEAM {
     var temp = new ForceEAM();
     temp.cutoff = this.cutoff;
     temp.mass = this.mass;
@@ -517,5 +517,5 @@ if useChplVis then pauseVdebug();
     temp.rhoIO = this.rhoIO.replicate();
     temp.fIO   = this.fIO.replicate();
     return temp;
-  }
+  } */
 }

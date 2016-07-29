@@ -55,9 +55,12 @@ proc initGrid(latticeConstant: real, const ref force: Force) {
 
       const invBoxSize = (1/boxSize(1), 1/boxSize(2), 1/boxSize(3));
       var MyDom = new Domain(localDom=MyLocDom,
-                         invBoxSize=invBoxSize, boxSpace=boxSpace, numBoxes=numBoxes,
-                         domHigh=domHigh, domLow=domLow,
-                         force=if(replicateForce) then force.replicate() else force);
+                             invBoxSize=invBoxSize,
+                             boxSpace=boxSpace,
+                             numBoxes=numBoxes,
+                             domHigh=domHigh,
+                             domLow=domLow,
+                             force=force);
 
       Grid[ijk] = MyDom;
 
@@ -82,7 +85,7 @@ local {
         const maxSize = max(size0, size1, size2);
         MyDom.bufDom = {1..maxSize*2*MAXATOMS};
       }
- 
+
       var neighOff : [neighDom] int3;
       neighOff[1] = (-1,0,0);
       neighOff[2] = (1,0,0);
@@ -218,7 +221,7 @@ local {
   }
 
   // compute the resulting temperature
-  // kinetic energy  = 3/2 kB * Temperature 
+  // kinetic energy  = 3/2 kB * Temperature
   if (temp == 0.0) then return;
   var vZero = (0.0, 0.0, 0.0);
   setVcm(vZero);
@@ -302,7 +305,7 @@ local {
       const halo => MyDom.halo;
       const neighDom = MyDom.neighDom;
       const invBoxSize = MyDom.invBoxSize;
- 
+
       var neighOff : [neighDom] int3;
       neighOff[1] = (-1,0,0);
       neighOff[2] = (1,0,0);
@@ -338,11 +341,11 @@ local {
             // remove from old box (copy the last atom in old box to ii)
             const oldCount = box.count;
             box.count -= 1;
-            if(box.count) then 
+            if(box.count) then
               box.atoms[ii] = box.atoms[oldCount];
 
             // decrement number of atoms if dest box not local
-            if(!MyDom.localDom.member(dBoxIdx)) then MyDom.numLocalAtoms -= 1; 
+            if(!MyDom.localDom.member(dBoxIdx)) then MyDom.numLocalAtoms -= 1;
           }
           else ii += 1;
         }
@@ -397,7 +400,7 @@ proc haloExchange(const ref MyDom : Domain, const in face:int) {
 
   const g = Grid[nf];
   ref actualPack = pack[1..counter];
-  
+
   // TODO: put 'counter' into a const to avoid communication
   on locGrid[nf] {
     g.recvBuf[target][1..counter] = actualPack;
@@ -421,19 +424,19 @@ proc exchangeData(const ref MyDom:Domain, const in i : int) {
   MyDom.numLocalAtoms += nAtoms;
 }
 
-// if 2 or more cells in this dimension, then read 
+// if 2 or more cells in this dimension, then read
 // and add atoms in parallel
-proc exchangeData(const ref MyDom:Domain, const in i : int) 
+proc exchangeData(const ref MyDom:Domain, const in i : int)
             where MyDom.localDom.dim((i/2):int+1).size > 1 {
   var nAtomsM : int(32) = 0;
   var nAtomsP : int(32) = 0;
   cobegin with (ref nAtomsM, ref nAtomsP) {
     {
-      haloExchange(MyDom, i); 
+      haloExchange(MyDom, i);
       nAtomsM = gatherAtoms(MyDom, i);
     }
-    { 
-      haloExchange(MyDom, i+1); 
+    {
+      haloExchange(MyDom, i+1);
       nAtomsP = gatherAtoms(MyDom, i+1);
     }
   }
@@ -483,7 +486,7 @@ tArray[timerEnum.FCREATE].stop();
 
   f.print();
 
-  writeln(); 
+  writeln();
 
   var latticeConstant : real = lat;
   if(lat < 0.0) then latticeConstant = f.lat;
@@ -537,11 +540,11 @@ tArray[timerEnum.F1].stop();
   writef("   Box factor         : [%14.10dr, %14.10dr, %14.10dr ]\n", boxSize(1)/cutoff, boxSize(2)/cutoff, boxSize(3)/cutoff);
   // writeln("   Max Link Cell Occupancy: ", maxOcc, " of ", MAXATOMS);
 
-  writeln(); 
+  writeln();
 
   writef("Initial energy : %14.12dr, atom count : %i \n", vSim.eInit/vSim.nAtomsInit, vSim.nAtomsInit);
 
-  writeln(); 
+  writeln();
 
   var yyyymmdd = getCurrentDate();
   writeln(yyyymmdd(1), "-", yyyymmdd(2), "-", yyyymmdd(3), ", ", getCurrentTime(TimeUnits.hours), " Initialization Finished");
@@ -553,11 +556,11 @@ inline proc getBoxFromCoords(const ref r : real3, const ref invBoxSize: real3) {
   const temp = r * invBoxSize + (1,1,1);
 
   // can't cast from 3*real to 3*int (yet?)
-  for i in 1..3 do 
+  for i in 1..3 do
     boxCoords(i) = temp(i) : int;
 
   return boxCoords;
-  
+
 }
 
 proc createFccLattice(lat : real) : void {
@@ -601,7 +604,7 @@ local {
 
               MyDom.cells[box].count += 1;
               MyDom.cells[box].atoms[MyDom.cells[box].count] = new Atom(gid, mass, 1 : int(32), (rx, ry, rz));
-              if(MyDom.localDom.member(box)) then MyDom.numLocalAtoms += 1; 
+              if(MyDom.localDom.member(box)) then MyDom.numLocalAtoms += 1;
 
             }
           }
@@ -616,7 +619,7 @@ local {
 }
 
 // TODO: max reduce intent is still not available as of Chapel v1.12.
-// Currently this proc is completely serial 
+// Currently this proc is completely serial
 // Rewrite this proc using max reduce intent when available
 proc maxOccupancy() {
 tArray[timerEnum.COMMREDUCE].start();
@@ -772,17 +775,17 @@ if useChplVis then pauseVdebug();
   writeln("   dataParTasksPerLocale : ", dataParTasksPerLocale);
   writeln("   Number of cores       : ", Locales(0).numPUs());
 
-  writeln(); 
+  writeln();
 
 tArray[timerEnum.INIT].start();
   initSimulation();
 tArray[timerEnum.INIT].stop();
 
-  writeln(); 
+  writeln();
 
   yyyymmdd = getCurrentDate();
   writeln(yyyymmdd(1), "-", yyyymmdd(2), "-", yyyymmdd(3), ", ", getCurrentTime(TimeUnits.hours), " Starting simulation");
-  writeln(); 
+  writeln();
   writeln("#                                                                                         Performance");
   writeln("#  Loop   Time(fs)       Total Energy   Potential Energy     Kinetic Energy  Temperature   (us/atom)     # Atoms");
 
@@ -809,9 +812,9 @@ if useChplVis then stopVdebug();
 tArray[timerEnum.TOTAL].stop();
 
   yyyymmdd = getCurrentDate();
-  writeln(); 
+  writeln();
   writeln(yyyymmdd(1), "-", yyyymmdd(2), "-", yyyymmdd(3), ", ", getCurrentTime(TimeUnits.hours), " Ending simulation");
-  writeln(); 
+  writeln();
 
   const eInitial = vSim.eInit/vSim.nAtomsInit;
   const eFinal = (keTotal+peTotal)/numAtoms;
@@ -828,7 +831,7 @@ tArray[timerEnum.TOTAL].stop();
     writeln("# WARNING: ", nAtomsDelta, " atoms lost #");
     writeln("#############################");
   }
-  
+
 
   writeln();
   writeln("Timings");
@@ -839,7 +842,7 @@ tArray[timerEnum.TOTAL].stop();
   var loopTime : real = tArray(timerEnum.LOOP).duration;
   for i in 1..timerEnum.ATOMHALO do if(tArray(i).times > 0) then tArray(i).print(loopTime);
   for i in timerEnum.SORT..timers do if(tArray(i).times > 0) then tArray(i).print(loopTime);
-  writeln(); 
+  writeln();
   yyyymmdd = getCurrentDate();
   writeln(yyyymmdd(1), "-", yyyymmdd(2), "-", yyyymmdd(3), ", ", getCurrentTime(TimeUnits.hours), " CoMD Ending");
 }
