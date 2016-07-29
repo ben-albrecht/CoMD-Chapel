@@ -10,7 +10,7 @@ inline proc dot(const in v1:real3, const in v2:real3) : real {
   return r;
 }
 
-class Ticker {
+record Ticker {
   var name : string;
   var tick : Timer;
   var duration : real;

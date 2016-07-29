@@ -4,6 +4,7 @@ use types;
 use configs;
 use helpers;
 use force;
+use forcelj;
 
 // Defines the problem space
 var simLow    : real3; // simulation lower bound
@@ -42,7 +43,7 @@ record Box {
   var atoms : [1..MAXATOMS] Atom;
 }
 
-class FaceArr {
+record FaceArr {
   var d : domain(3);
   var a : [d] Box;
 }
@@ -79,7 +80,7 @@ class Domain {
   var domKEPE        : (real, real);                       // total KE, PE for this domain
   var vcmTemp        : real3;                              // temp vcm for this domain
 
-  const force        : Force;                              // clones! may the force be with you
+  const force        : ForceLJ;                              // clones! may the force be with you
 //  var haloTicker1    = new Ticker("      commHaloPull");   // ticker for halo exchange
 //  var haloTicker2    = new Ticker("      commHaloSync");   // ticker for halo exchange
 //  var haloTicker3    = new Ticker("      commHaloUpdt");   // ticker for halo exchange

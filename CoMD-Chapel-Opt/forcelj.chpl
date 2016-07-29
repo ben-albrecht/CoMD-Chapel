@@ -124,6 +124,7 @@ if useChplVis then pauseVdebug();
     writeln("   Sigma            : ", sigma, " Angstroms");
   }
 
+  proc epilogue() : void { }
   /*proc replicate() : ForceLJ {
     var temp = new ForceLJ();
     temp.cutoff = this.cutoff;

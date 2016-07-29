@@ -11,18 +11,20 @@ use VisualDebug;
 use rand;
 
 var vSim  : Validate;
-var f : Force;
+//var f : Force;
+//const f = new ForceEAM(potDir, potName, potType);
+const f = new ForceLJ();
 
-proc initGrid(latticeConstant: real, const ref force: Force) {
+proc initGrid(latticeConstant: real) {
   simLow  = (0.0,0.0,0.0);
   const simSize = (nx:real, ny:real, nz:real) * latticeConstant;
   simHigh = simSize;
 
-  const minSimSize = 2*force.cutoff;
+  const minSimSize = 2*f.cutoff;
   assert(simSize(1) >= minSimSize && simSize(2) >= minSimSize && simSize(3) >= minSimSize);
-  assert(force.latticeType == "FCC" || force.latticeType == "fcc");
+  assert(f.latticeType == "FCC" || f.latticeType == "fcc");
 
-  for i in 1..3 do numBoxes(i) = (simSize(i)/force.cutoff) : int;
+  for i in 1..3 do numBoxes(i) = (simSize(i)/f.cutoff) : int;
 
   // assert(numBoxes(1) >= xproc && numBoxes(2) >= yproc && numBoxes(3) >= zproc);
 
@@ -60,7 +62,7 @@ proc initGrid(latticeConstant: real, const ref force: Force) {
                              numBoxes=numBoxes,
                              domHigh=domHigh,
                              domLow=domLow,
-                             force=force);
+                             force=f);
 
       Grid[ijk] = MyDom;
 
@@ -470,18 +472,19 @@ tArray[timerEnum.REDIST].stop();
 
 proc computeForce() {
 tArray[timerEnum.FORCE].start();
-  if(replicateForce) then f.computeLocal(); else f.compute();
+  f.computeLocal();
+  //if(replicateForce) then f.computeLocal(); else f.compute();
 tArray[timerEnum.FORCE].stop();
 }
 
 proc initSimulation() {
 tArray[timerEnum.FCREATE].start();
-  if(doeam) {
-    f = new ForceEAM(potDir, potName, potType);
-  }
-  else {
-    f = new ForceLJ();
-  }
+  //if(doeam) {
+  //  f = new ForceEAM(potDir, potName, potType);
+  //}
+  //else {
+  //  f = new ForceLJ();
+  //}
 tArray[timerEnum.FCREATE].stop();
 
   f.print();
@@ -493,7 +496,7 @@ tArray[timerEnum.FCREATE].stop();
 
 tArray[timerEnum.INITGRID].start();
 if useChplVis then tagVdebug("initGrid");
-  initGrid(latticeConstant, f);
+  initGrid(latticeConstant);
 if useChplVis then pauseVdebug();
 tArray[timerEnum.INITGRID].stop();
 
@@ -736,7 +739,7 @@ if useChplVis then pauseVdebug();
       writeln("--lat            : lattice parameter (in Angs, default -1.0)");
       writeln("--temp           : initial temprature (in K, default 600K)");
       writeln("--delta          : initial delta (in Angs, default 0)");
-      writeln("--replicateForce : replicate the force object per locale (default true, will replicate)");
+      //writeln("--replicateForce : replicate the force object per locale (default true, will replicate)");
       writeln("--useChplVis     : enable chplvis (default false, disabled)");
       writeln("--visName        : name of chplvis output file (default MD-Vis-0)");
       exit(0);

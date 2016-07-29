@@ -6,7 +6,7 @@ use force;
 use BlockDist;
 use VisualDebug;
 
-class InterpolationObject {
+record InterpolationObject {
   var n : int;
   var x0 : real;
   var dx : real;
@@ -65,12 +65,12 @@ class InterpolationObject {
 
 type RList = MAXATOMS*real;
 
-class EAMFaceArr {
+record EAMFaceArr {
   var d : domain(3);
   var a : [d] [1..MAXATOMS] real;
 }
 
-class EAMDomain {
+record EAMDomain {
   var localDom  : domain(3);
   var halo      = localDom.expand(1);
   var dfEmbed   : [halo] RList;
@@ -85,7 +85,7 @@ class EAMDomain {
 //  var ticker    = new Ticker("     eamcommPull");   // ticker for halo exchange  
 }
 
-class EAMPot {
+record EAMPot {
   var eamDom : [locDom] EAMDomain;
 }
 
@@ -113,7 +113,7 @@ record ForceEAM : Force {
       var errMsg : string = "Potential type" + potType + " not supported. Fatal error";
       throwError(errMsg);
     }
-    this.eamPot = nil;
+    //this.eamPot = nil;
   }
 
   proc epilogue() : void {
@@ -291,7 +291,7 @@ if useChplVis then pauseVdebug();
     const dest => MyEAMDom.destSlice;
     const src => MyEAMDom.srcSlice;
     const nf = MyEAMDom.neighs[face];
-    var nDest => MyEAMDom.dfEmbed[dest[face]];
+    const nDest => MyEAMDom.dfEmbed[dest[face]];
     on locGrid[nf] {
       const sf = src[face];
       const ec => eamDom[nf].dfEmbed[sf];
@@ -425,7 +425,7 @@ if useChplVis then tagVdebug("computeEAMForce");
       on locGrid[ijk] {
         const MyDom = Grid[ijk];
         const MyEAMDom = eamDom[ijk];
-        const force = MyDom.force : ForceEAM;
+        const force = MyDom.force;
 local {
         const neighs = {-1..1, -1..1, -1..1};
         coforall (box, f, pe, dfEmbed, rhoBar, boxIdx) in zip(MyDom.cells[MyDom.localDom], MyDom.f, MyDom.pe, MyEAMDom.dfEmbed[MyDom.localDom], MyEAMDom.rhoBar[MyDom.localDom], MyDom.localDom) {
